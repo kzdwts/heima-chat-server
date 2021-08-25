@@ -30,4 +30,10 @@ public interface FriendService {
      */
     List<User> findFriendReqByUserid(String userid);
 
+    /**
+     * 接受好友请求
+     *
+     * @param reqid
+     */
+    void acceptFriendReq(String reqid);
 }

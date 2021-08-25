@@ -78,6 +78,30 @@ public class FriendServiceImpl implements FriendService {
         return friendUserList;
     }
 
+    @Override
+    public void acceptFriendReq(String reqid) {
+        // 处理好友请求
+        TbFriendReq friendReq = friendReqMapper.selectByPrimaryKey(reqid);
+        friendReq.setStatus(1);
+        friendReqMapper.updateByPrimaryKeySelective(friendReq);
+
+        // 互相添加好友
+        TbFriend friend1 = new TbFriend();
+        friend1.setId(idWorker.nextId());
+        friend1.setUserid(friendReq.getFromUserid());
+        friend1.setFriendsId(friendReq.getToUserid());
+        friend1.setCreatetime(new Date());
+
+        TbFriend friend2 = new TbFriend();
+        friend2.setId(idWorker.nextId());
+        friend2.setUserid(friendReq.getToUserid());
+        friend2.setFriendsId(friendReq.getFromUserid());
+        friend2.setCreatetime(new Date());
+
+        friendMapper.insert(friend1);
+        friendMapper.insert(friend2);
+    }
+
 
     private void checkAllowToAddFriend(String userid, TbUser friend) {
         // 1、用户不能添加自己为好友

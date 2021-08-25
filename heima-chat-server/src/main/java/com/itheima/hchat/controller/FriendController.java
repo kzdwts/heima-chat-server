@@ -43,9 +43,32 @@ public class FriendController {
         }
     }
 
+    /**
+     * 查看好友请求
+     *
+     * @param userid
+     * @return
+     */
     @GetMapping("/findFriendReqByUserid")
     public List<User> findFriendReqByUserid(String userid) {
         return friendService.findFriendReqByUserid(userid);
+    }
+
+    /**
+     * 接受好友请求
+     *
+     * @param reqid
+     * @return
+     */
+    @PostMapping("/acceptFriendReq")
+    public Result acceptFriendReq(String reqid) {
+        try {
+            friendService.acceptFriendReq(reqid);
+            return new Result(true, "操作成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "操作失败");
+        }
     }
 
 }
