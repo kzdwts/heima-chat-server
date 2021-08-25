@@ -2,6 +2,8 @@ package com.itheima.hchat.service;
 
 import com.itheima.hchat.pojo.TbChatRecord;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -18,4 +20,14 @@ public interface ChatRecordService {
      * @param tbChatRecord
      */
     void insert(TbChatRecord tbChatRecord);
+
+    /**
+     * 查询和好友聊天记录数据
+     *
+     * @param userid
+     * @param friendid
+     * @return
+     */
+    List<TbChatRecord> findByUseridAndFriendid(String userid, String friendid);
+
 }
