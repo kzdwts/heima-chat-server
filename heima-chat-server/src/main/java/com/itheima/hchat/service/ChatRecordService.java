@@ -38,4 +38,10 @@ public interface ChatRecordService {
      */
     List<TbChatRecord> findUnreadByUserid(String userid);
 
+    /**
+     * 更新消息状态为已读
+     *
+     * @param id
+     */
+    void updateStatusHasRead(String id);
 }

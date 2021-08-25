@@ -55,6 +55,17 @@ public class ChatRecordServiceImpl implements ChatRecordService {
         // 用or连接
         example.or(criteria1);
         example.or(criteria2);
+
+        // 更新未读为已读
+        TbChatRecordExample exampleQuerySendToMe = new TbChatRecordExample();
+        TbChatRecordExample.Criteria criteriaQuerySendToMe = exampleQuerySendToMe.createCriteria();
+        criteriaQuerySendToMe.andFriendidEqualTo(userid);
+        List<TbChatRecord> tbChatRecords = chatRecordMapper.selectByExample(exampleQuerySendToMe);
+        for (TbChatRecord record : tbChatRecords) {
+            record.setHasRead(1);
+            chatRecordMapper.updateByPrimaryKey(record);
+        }
+
         return chatRecordMapper.selectByExample(example);
     }
 
@@ -66,6 +77,14 @@ public class ChatRecordServiceImpl implements ChatRecordService {
 
         List<TbChatRecord> chatRecordList = chatRecordMapper.selectByExample(example);
         return chatRecordList;
+    }
+
+    @Override
+    public void updateStatusHasRead(String id) {
+        TbChatRecord chatRecord = new TbChatRecord();
+        chatRecord.setId(id);
+        chatRecord.setHasRead(1);
+        chatRecordMapper.updateByPrimaryKey(chatRecord);
     }
 
 }
