@@ -1,0 +1,110 @@
+package com.itheima.hchat.service.impl;
+
+import com.itheima.hchat.mapper.TbFriendMapper;
+import com.itheima.hchat.mapper.TbFriendReqMapper;
+import com.itheima.hchat.mapper.TbUserMapper;
+import com.itheima.hchat.pojo.*;
+import com.itheima.hchat.pojo.vo.User;
+import com.itheima.hchat.service.FriendService;
+import com.itheima.hchat.util.IdWorker;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created with IntelliJ IDEA.
+ *
+ * @Description:
+ * @author: Kang Yong
+ * @date: 2021/8/24 17:11
+ * @version: v1.0
+ */
+@Service
+@Transactional
+public class FriendServiceImpl implements FriendService {
+
+    @Autowired
+    private TbFriendReqMapper friendReqMapper;
+
+    @Autowired
+    private TbFriendMapper friendMapper;
+
+    @Autowired
+    private TbUserMapper userMapper;
+
+    @Autowired
+    private IdWorker idWorker;
+
+    @Override
+    public void sendRequest(String fromUserid, String toUserid) {
+        TbUser friend = userMapper.selectByPrimaryKey(toUserid);
+        // 检查是否可以添加好友
+        this.checkAllowToAddFriend(fromUserid, friend);
+
+        // 入库
+        TbFriendReq friendReq = new TbFriendReq();
+        friendReq.setFromUserid(fromUserid);
+        friendReq.setToUserid(toUserid);
+        friendReq.setId(idWorker.nextId());
+        friendReq.setStatus(0);
+        friendReq.setCreatetime(new Date());
+        friendReqMapper.insertSelective(friendReq);
+    }
+
+    @Override
+    public List<User> findFriendReqByUserid(String userid) {
+        // 根据用户id查询对应的好友请求
+        TbFriendReqExample example = new TbFriendReqExample();
+        TbFriendReqExample.Criteria criteria = example.createCriteria();
+        criteria.andToUseridEqualTo(userid);
+        criteria.andStatusEqualTo(0);
+
+        List<TbFriendReq> friendReqList = friendReqMapper.selectByExample(example);
+        List<User> friendUserList = new ArrayList<>();
+
+        // 根据好友请求，蒋发起好友请求的用户信息返回
+        for (TbFriendReq friendReq : friendReqList) {
+            TbUser tbUser = userMapper.selectByPrimaryKey(friendReq.getFromUserid());
+            User user = new User();
+            BeanUtils.copyProperties(tbUser, user);
+            friendUserList.add(user);
+        }
+        return friendUserList;
+    }
+
+
+    private void checkAllowToAddFriend(String userid, TbUser friend) {
+        // 1、用户不能添加自己为好友
+        if (friend.getId().equals(userid)) {
+            throw new RuntimeException("不能添加自己为好友");
+        }
+        // 2、用户不能重复添加
+        // 如果用户已经是好友，不能重复添加
+        TbFriendExample friendExample = new TbFriendExample();
+        TbFriendExample.Criteria friendExampleCriteria = friendExample.createCriteria();
+        friendExampleCriteria.andUseridEqualTo(userid);
+        friendExampleCriteria.andFriendsIdEqualTo(friend.getId());
+        List<TbFriend> friendList = friendMapper.selectByExample(friendExample);
+        if (friendList != null && friendList.size() > 0) {
+            throw new RuntimeException(friend.getUsername() + "已经是您的好友");
+        }
+
+        // 判断是否已经发送了好友申请，如果已经提交好友申请，
+        TbFriendReqExample friendReqExample = new TbFriendReqExample();
+        TbFriendReqExample.Criteria friendReqExampleCriteria = friendReqExample.createCriteria();
+        friendReqExampleCriteria.andFromUseridEqualTo(userid);
+        friendReqExampleCriteria.andToUseridEqualTo(friend.getId());
+        friendReqExampleCriteria.andStatusEqualTo(0);
+        List<TbFriendReq> friendReqList = friendReqMapper.selectByExample(friendReqExample);
+        if (friendReqList != null && friendReqList.size() > 0) {
+            throw new RuntimeException("已经申请过了");
+        }
+    }
+
+}
