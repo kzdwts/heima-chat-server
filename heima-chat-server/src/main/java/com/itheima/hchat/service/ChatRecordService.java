@@ -30,4 +30,12 @@ public interface ChatRecordService {
      */
     List<TbChatRecord> findByUseridAndFriendid(String userid, String friendid);
 
+    /**
+     * 查询未读消息
+     *
+     * @param userid
+     * @return
+     */
+    List<TbChatRecord> findUnreadByUserid(String userid);
+
 }

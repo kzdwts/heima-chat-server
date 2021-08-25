@@ -41,4 +41,20 @@ public class ChatRecordController {
             return new ArrayList<TbChatRecord>();
         }
     }
+
+    /**
+     * 查询未读消息
+     *
+     * @param userid
+     * @return
+     */
+    @GetMapping("/findUnreadByUserid")
+    public List<TbChatRecord> findUnreadByUserid(String userid) {
+        try {
+            return chatRecordService.findUnreadByUserid(userid);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<TbChatRecord>();
+        }
+    }
 }

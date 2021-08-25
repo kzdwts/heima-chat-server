@@ -58,4 +58,14 @@ public class ChatRecordServiceImpl implements ChatRecordService {
         return chatRecordMapper.selectByExample(example);
     }
 
+    @Override
+    public List<TbChatRecord> findUnreadByUserid(String userid) {
+        TbChatRecordExample example = new TbChatRecordExample();
+        TbChatRecordExample.Criteria criteria = example.createCriteria();
+        criteria.andFriendidEqualTo(userid);
+
+        List<TbChatRecord> chatRecordList = chatRecordMapper.selectByExample(example);
+        return chatRecordList;
+    }
+
 }
