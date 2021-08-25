@@ -1,5 +1,6 @@
 package com.itheima.hchat.service;
 
+import com.itheima.hchat.pojo.vo.FriendReq;
 import com.itheima.hchat.pojo.vo.User;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public interface FriendService {
      * @param userid 当前登录的用户
      * @return 请求好友的列表
      */
-    List<User> findFriendReqByUserid(String userid);
+    List<FriendReq> findFriendReqByUserid(String userid);
 
     /**
      * 接受好友请求
@@ -36,4 +37,11 @@ public interface FriendService {
      * @param reqid
      */
     void acceptFriendReq(String reqid);
+
+    /**
+     * 忽略好友请求
+     *
+     * @param reqid 好友请求的id
+     */
+    void ignoreFriendReq(String reqid);
 }

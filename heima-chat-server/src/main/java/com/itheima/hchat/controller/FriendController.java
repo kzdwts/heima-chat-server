@@ -1,6 +1,7 @@
 package com.itheima.hchat.controller;
 
 import com.itheima.hchat.pojo.TbFriendReq;
+import com.itheima.hchat.pojo.vo.FriendReq;
 import com.itheima.hchat.pojo.vo.Result;
 import com.itheima.hchat.pojo.vo.User;
 import com.itheima.hchat.service.FriendService;
@@ -50,7 +51,7 @@ public class FriendController {
      * @return
      */
     @GetMapping("/findFriendReqByUserid")
-    public List<User> findFriendReqByUserid(String userid) {
+    public List<FriendReq> findFriendReqByUserid(String userid) {
         return friendService.findFriendReqByUserid(userid);
     }
 
@@ -70,5 +71,24 @@ public class FriendController {
             return new Result(false, "操作失败");
         }
     }
+
+    /**
+     * 忽略好友请求
+     *
+     * @param reqid
+     * @return
+     */
+    @PostMapping("/ignoreFriendReq")
+    public Result ignoreFriendReq(String reqid) {
+        try {
+            friendService.ignoreFriendReq(reqid);
+            return new Result(true, "操作成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "操作失败");
+        }
+    }
+
+
 
 }

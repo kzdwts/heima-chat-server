@@ -4,10 +4,9 @@ import com.itheima.hchat.mapper.TbFriendMapper;
 import com.itheima.hchat.mapper.TbFriendReqMapper;
 import com.itheima.hchat.mapper.TbUserMapper;
 import com.itheima.hchat.pojo.*;
-import com.itheima.hchat.pojo.vo.User;
+import com.itheima.hchat.pojo.vo.FriendReq;
 import com.itheima.hchat.service.FriendService;
 import com.itheima.hchat.util.IdWorker;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,24 +57,25 @@ public class FriendServiceImpl implements FriendService {
     }
 
     @Override
-    public List<User> findFriendReqByUserid(String userid) {
+    public List<FriendReq> findFriendReqByUserid(String userid) {
         // 根据用户id查询对应的好友请求
         TbFriendReqExample example = new TbFriendReqExample();
         TbFriendReqExample.Criteria criteria = example.createCriteria();
         criteria.andToUseridEqualTo(userid);
         criteria.andStatusEqualTo(0);
 
-        List<TbFriendReq> friendReqList = friendReqMapper.selectByExample(example);
-        List<User> friendUserList = new ArrayList<>();
+        List<TbFriendReq> tbFriendReqList = friendReqMapper.selectByExample(example);
+        List<FriendReq> friendReqList = new ArrayList<>();
 
         // 根据好友请求，蒋发起好友请求的用户信息返回
-        for (TbFriendReq friendReq : friendReqList) {
-            TbUser tbUser = userMapper.selectByPrimaryKey(friendReq.getFromUserid());
-            User user = new User();
-            BeanUtils.copyProperties(tbUser, user);
-            friendUserList.add(user);
+        for (TbFriendReq tbFriendReq : tbFriendReqList) {
+            TbUser tbUser = userMapper.selectByPrimaryKey(tbFriendReq.getFromUserid());
+            FriendReq friendReq = new FriendReq();
+            BeanUtils.copyProperties(tbUser, friendReq);
+            friendReq.setId(tbFriendReq.getId());
+            friendReqList.add(friendReq);
         }
-        return friendUserList;
+        return friendReqList;
     }
 
     @Override
@@ -100,6 +100,14 @@ public class FriendServiceImpl implements FriendService {
 
         friendMapper.insert(friend1);
         friendMapper.insert(friend2);
+    }
+
+    @Override
+    public void ignoreFriendReq(String reqid) {
+        TbFriendReq friendReq = friendReqMapper.selectByPrimaryKey(reqid);
+        // 设置为已处理
+        friendReq.setStatus(1);
+        friendReqMapper.updateByPrimaryKeySelective(friendReq);
     }
 
 
