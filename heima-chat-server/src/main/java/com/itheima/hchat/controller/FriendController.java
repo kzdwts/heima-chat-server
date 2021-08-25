@@ -8,6 +8,7 @@ import com.itheima.hchat.service.FriendService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -90,5 +91,20 @@ public class FriendController {
     }
 
 
+    /**
+     * 查询好友列表
+     *
+     * @param userid
+     * @return
+     */
+    @GetMapping("/findFriendByUserid")
+    public List<User> findFriendByUserid(String userid) {
+        try {
+            return friendService.findFriendByUserid(userid);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
 
 }

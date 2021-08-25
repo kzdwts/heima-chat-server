@@ -44,4 +44,12 @@ public interface FriendService {
      * @param reqid 好友请求的id
      */
     void ignoreFriendReq(String reqid);
+
+    /**
+     * 查询我的好友
+     *
+     * @param userid 当前登录的用户id
+     * @return 用户的好友列表
+     */
+    List<User> findFriendByUserid(String userid);
 }

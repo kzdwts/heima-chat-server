@@ -5,6 +5,7 @@ import com.itheima.hchat.mapper.TbFriendReqMapper;
 import com.itheima.hchat.mapper.TbUserMapper;
 import com.itheima.hchat.pojo.*;
 import com.itheima.hchat.pojo.vo.FriendReq;
+import com.itheima.hchat.pojo.vo.User;
 import com.itheima.hchat.service.FriendService;
 import com.itheima.hchat.util.IdWorker;
 import org.springframework.beans.BeanUtils;
@@ -110,6 +111,26 @@ public class FriendServiceImpl implements FriendService {
         friendReqMapper.updateByPrimaryKeySelective(friendReq);
     }
 
+    @Override
+    public List<User> findFriendByUserid(String userid) {
+        // 查询好友列表
+        TbFriendExample example = new TbFriendExample();
+        TbFriendExample.Criteria criteria = example.createCriteria();
+        criteria.andUseridEqualTo(userid);
+        List<TbFriend> tbFriendList = friendMapper.selectByExample(example);
+
+        List<User> friendUserList = new ArrayList<>();
+
+        // 查询好友的用户信息
+        for (TbFriend tbFriend : tbFriendList) {
+            TbUser tbUser = userMapper.selectByPrimaryKey(tbFriend.getFriendsId());
+            User friend = new User();
+            BeanUtils.copyProperties(tbUser, friend);
+            friendUserList.add(friend);
+        }
+        return friendUserList;
+    }
+
 
     private void checkAllowToAddFriend(String userid, TbUser friend) {
         // 1、用户不能添加自己为好友
@@ -138,5 +159,6 @@ public class FriendServiceImpl implements FriendService {
             throw new RuntimeException("已经申请过了");
         }
     }
+
 
 }
