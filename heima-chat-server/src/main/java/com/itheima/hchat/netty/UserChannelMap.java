@@ -69,4 +69,14 @@ public class UserChannelMap {
         }
     }
 
+    /**
+     * 根据用户id查找通道信息
+     *
+     * @param friendid
+     * @return
+     */
+    public static Channel get(String friendid) {
+        return userChannelMap.get(friendid);
+    }
+
 }

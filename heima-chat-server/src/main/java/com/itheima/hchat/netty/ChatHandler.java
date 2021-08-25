@@ -1,6 +1,10 @@
 package com.itheima.hchat.netty;
 
 import com.alibaba.fastjson.JSON;
+import com.itheima.hchat.pojo.TbChatRecord;
+import com.itheima.hchat.service.ChatRecordService;
+import com.itheima.hchat.util.SpringUtil;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.group.ChannelGroup;
@@ -38,13 +42,31 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
         // 处理消息
         Message message = JSON.parseObject(text, Message.class);
 
+        // 通过工具类获取容器里面的业务接口
+        ChatRecordService chatRecordService = SpringUtil.getBean(ChatRecordService.class);
+
         switch (message.getType()) {
-            case "0":
+            // 处理客户端连接的消息
+            case 0:
                 // 建立连接
                 String userid = message.getChatRecord().getUserid();
                 UserChannelMap.put(userid, ctx.channel());
                 System.out.println("建立用户：" + userid + " 与通道：" + ctx.channel().id() + "的关联");
                 UserChannelMap.print();
+                break;
+            case 1:
+                // 将聊天消息保存到数据库
+                TbChatRecord chatRecord = message.getChatRecord();
+                chatRecordService.insert(chatRecord);
+
+                // 1.如果发送消息好友在线，可以直接发送消息
+                Channel friendChannel = UserChannelMap.get(chatRecord.getFriendid());
+                if (friendChannel != null) {
+                    friendChannel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(message)));
+                } else {
+                    // 2.如果不在线，暂时不发送
+                    System.out.println("用户：" + chatRecord.getFriendid() + "不在线");
+                }
                 break;
         }
 

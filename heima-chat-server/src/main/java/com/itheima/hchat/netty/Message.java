@@ -12,15 +12,15 @@ import com.itheima.hchat.pojo.TbChatRecord;
  */
 public class Message {
 
-    private String type; // 消息类型
+    private Integer type; // 消息类型
     private TbChatRecord chatRecord; // 聊天消息
     private Object ext; // 扩展内容
 
-    public String getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 
